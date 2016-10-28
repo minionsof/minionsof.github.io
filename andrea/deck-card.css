@@ -13,12 +13,60 @@ deck-card {
   align-items: center;
   background-size: cover;
   position: relative;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  border-radius: 8px;
+}
+
+deck-card.good {
+  -webkit-filter: hue-rotate(90deg);
+  -moz-filter: hue-rotate(90deg);
+  filter: hue-rotate(90deg);
+}
+deck-card.evil {
+  -webkit-filter: sepia(30%);
+  -moz-filter: sepia(30%);
+  filter: sepia(30%);
+}
+
+/*
+deck-card.evil:after,
+deck-card.good:after {
+  content: '';
+  position: absolute;
+  display: block;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: 8px;
+}
+*/
+
+deck-card:before {
+  opacity: .8;
+  position: absolute;
+  display: block;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding-bottom: 8px;
+  text-align: center;
+  font-size: 1.8em;
+  content: attr(name);
+  color: white;
+  text-shadow: 0 0 4px #000000;
+  font-family: 'Shadows Into Light', cursive;
+  font-weight: bold;
+  z-index: 1;
 }
 
 deck-card canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
+  border-radius: 8px;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 deck-card.shadowed {
