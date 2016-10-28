@@ -1,3 +1,11 @@
+function maxDimensions(originalWidth, originalHeight, maxWidth, maxHeight) {
+  const aspectRatio = originalWidth / originalHeight;
+  if (aspectRatio < 1) {
+    return { width: maxWidth, height: Math.floor(maxWidth / aspectRatio) };
+  }
+  return { width: Math.floor(maxWidth * aspectRatio), height: maxHeight };
+}
+
 class DeckCard extends HTMLCustomElement {
   connectedCallback() {
     const label = this.appendChild(
@@ -20,18 +28,19 @@ class DeckCard extends HTMLCustomElement {
             canvas.width = this.clientWidth;
             canvas.height = this.clientHeight;
             const context = canvas.getContext('2d');
+            const size = maxDimensions(image.width, image.height, canvas.width, canvas.height);
             const sourceX = 0;
             const sourceY = 0;
             const sourceWidth = image.width;
             const sourceHeight = image.height;
-            const destWidth = canvas.width;
-            const destHeight = canvas.height;
+            const destWidth = size.width;
+            const destHeight = size.height;
             const destX = canvas.width / 2 - destWidth / 2;
             const destY = canvas.height / 2 - destHeight / 2;
             context.drawImage(
               image,
-              sourceX, sourceY, sourceWidth, sourceHeight,
-              destX, destY, destWidth, destHeight
+              sourceX, sourceY, image.width, image.height,
+              destX, destY, size.width, size.height
             );
           };
           image.src = file.result;
