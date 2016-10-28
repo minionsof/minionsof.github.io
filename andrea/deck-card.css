@@ -1,0 +1,44 @@
+deck-card {
+  --min-height: 200px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  display: block;
+  font-family: sans-serif;
+  min-height: var(--min-height);
+  max-width: calc(var(--min-height) * 3 / 4);
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;  
+  align-items: center;
+  background-size: cover;
+  position: relative;
+}
+
+deck-card canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+deck-card.shadowed {
+  -webkit-box-shadow: 0px 0px 33px 0px rgba(0,0,0,0.75);
+  -moz-box-shadow: 0px 0px 33px 0px rgba(0,0,0,0.75);
+  box-shadow: 0px 0px 33px 0px rgba(0,0,0,0.75);
+}
+
+deck-card label {
+  -webkit-transition: all .3s ease-out;
+  -moz-transition: all .3s ease-out;
+  transition: all .3s ease-out;
+  font-weight: bold;
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 40px auto;
+  opacity: .5;
+}
+
+deck-card input {
+  opacity: 0;
+}
