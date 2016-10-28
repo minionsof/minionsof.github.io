@@ -1,9 +1,11 @@
-function maxDimensions(originalWidth, originalHeight, maxWidth, maxHeight) {
+function maxDimensions(originalWidth, originalHeight, targetWidth, targetHeight) {
   const aspectRatio = originalWidth / originalHeight;
+  const dimension = Math.max(targetWidth, targetHeight);
   if (aspectRatio < 1) {
-    return { width: maxWidth, height: Math.floor(maxWidth / aspectRatio) };
+    return { width: dimension, height: dimension / aspectRatio };
+  } else {
+    return { width: dimension * aspectRatio, height: dimension };
   }
-  return { width: Math.floor(maxWidth * aspectRatio), height: maxHeight };
 }
 
 class DeckCard extends HTMLCustomElement {
