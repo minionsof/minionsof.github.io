@@ -63,10 +63,18 @@ deck-card:before {
 }
 
 deck-card canvas {
+  -webkit-transition: all .3s ease-out;
+  -moz-transition: all .3s ease-out;
+  transition: all .3s ease-out;
   border-radius: 8px;
   position: absolute;
-  top: 0;
-  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+}
+
+deck-card canvas.rendered {
+  opacity: 1;
 }
 
 deck-card.shadowed {

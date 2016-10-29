@@ -9,8 +9,37 @@ class DeckCard extends HTMLCustomElement {
     return { width: dimension * aspectRatio, height: dimension };
   }
 
+  static getRotationInfo(orientation) {
+    const NONE = 0;
+    const HORIZONTAL = 1;
+    const VERTICAL = 2;
+    const OPERATIONS = [
+      [0, NONE],
+      [0, HORIZONTAL],
+      [180, NONE],
+      [0, VERTICAL],
+      [90, HORIZONTAL],
+      [90, NONE],
+      [-90, HORIZONTAL],
+      [-90, NONE]
+    ];
+    const index = orientation - 1;
+    const degrees = OPERATIONS[index][0];
+    return {
+      degrees: OPERATIONS[index][0],
+      flip: OPERATIONS[index][1] === HORIZONTAL ?
+        'horizontal' : (
+          OPERATIONS[index][1] === VERTICAL ? 'vertical' : ''
+        )
+    };
+  }
+
+  init() {
+    this._pixelRatio = window.devicePixelRatio || 1;
+  }
+
   connectedCallback() {
-    if (this.querySelector('canvas')) return;
+    if (this.querySelector('label')) return;
     const canvas = this.appendChild(
       this.ownerDocument.createElement('canvas')
     );
@@ -25,32 +54,59 @@ class DeckCard extends HTMLCustomElement {
     input.accept = 'image/*';
     input.onchange = (e) => {
       label.style.opacity = 0;
-      setTimeout(() => {
+      canvas.classList.remove('rendered');
+      if (!input.files.length) return;
+      new Promise((resolve) => {
+        EXIF.getData(input.files[0], function() {
+          resolve(
+            DeckCard.getRotationInfo(
+              EXIF.getTag(this, 'Orientation') || 1
+            )
+          );
+        });
+      }).then((info) => {
         const file = new FileReader();
         file.onload = (e) => {
           const image = new Image();
           image.onload = () => {
             const context = canvas.getContext('2d');
             context.clearRect(0, 0, canvas.width, canvas.height);
-            canvas.width = this.clientWidth;
-            canvas.height = this.clientHeight;
+            canvas.width = this.clientWidth * this._pixelRatio;
+            canvas.height = this.clientHeight * this._pixelRatio;
+            const halfWidth = canvas.width / 2;
+            const halfHeight = canvas.height / 2;
             const size = DeckCard.getTargetSize(
                 image.width, image.height,
                 canvas.width, canvas.height
             );
-            const destX = canvas.width / 2 - size.width / 2;
-            const destY = canvas.height / 2 - size.height / 2;
+            const destX = halfWidth - size.width / 2;
+            const destY = halfHeight - size.height / 2;
+            const rad = (info.degrees * Math.PI / 180) || 0;
+            if (rad) {
+              context.save();
+              context.translate(halfWidth, halfHeight);
+              context.rotate(rad);
+              context.translate(-halfWidth, -halfHeight);
+            }
             context.drawImage(
               image,
               0, 0, image.width, image.height,
               destX, destY, size.width, size.height
             );
+            if (rad) context.restore();
             this.addDecorations('rgba(0,0,0,.5)');
+            // in case it's prevented, don't show the card
+            // otherwise reveal it
+            if (this.dispatchEvent(
+              new CustomEvent('data-card-ready',
+                {detail: canvas.toDataURL()}
+              )
+            )) canvas.classList.add('rendered');
           };
           image.src = file.result;
         };
         file.readAsDataURL(input.files[0]);
-      }, 300);
+      });
     };
   }
 
@@ -65,15 +121,16 @@ class DeckCard extends HTMLCustomElement {
   addDecorations(fillStyle) {
     const canvas = this.querySelector('canvas');
     const context = canvas.getContext('2d');
-    const tickness = 15;
-    const minimalTickness = 5;
-    const gap = 5;
+    const tickness = 15 * this._pixelRatio;
+    const minimalTickness = 5 * this._pixelRatio;
+    const gap = 5 * this._pixelRatio;
     context.fillStyle = fillStyle;
     this._drawHEdge(context, canvas.height, tickness, minimalTickness, gap, canvas.width);
     this._drawVEdge(context, canvas.width, tickness, minimalTickness, gap, canvas.height);
     // todo: remove this
     this.name = ['Assassin', 'Morgana', 'Mordred', 'Percival', 'Merlin'][(Math.random() * 5) | 0];
-    this.className = Math.random() < .5 ? 'good' : 'evil';
+    this.classList.remove('good', 'evil');
+    this.classList.add(Math.random() < .5 ? 'good' : 'evil');
   }
 
   // yeah, these are two very dumb methods

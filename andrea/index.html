@@ -6,10 +6,22 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/document-register-element/1.1.1/document-register-element.js"></script>
     <script src="/js/main.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Shadows+Into+Light" rel="stylesheet">
+    <link rel="styleSheet" href="/css/main.css">
     <link rel="styleSheet" href="deck-card.css">
+    <script src="/node_modules/exif-js/exif.js"></script>
     <script src="deck-card.js"></script>
   </head>
   <body style="text-align:center;">
     <deck-card class="shadowed" style="margin:auto;margin-top: 20%;"></deck-card>
   </body>
+  <script>
+  document.querySelector('deck-card').addEventListener('data-card-ready', (e) => {
+    const link = document.querySelector('a') ||
+                 document.body.appendChild(document.createElement('a'));
+    link.classList.add('download');
+    link.setAttribute('download', 'deck-card.png');
+    link.href = e.detail;
+    link.textContent = 'DOWNLOAD';
+  });
+  </script>
 </html>
